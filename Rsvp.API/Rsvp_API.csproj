@@ -15,4 +15,7 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rsvp.Logic\Rsvp.Logic.csproj" />
+  </ItemGroup>
 </Project>
