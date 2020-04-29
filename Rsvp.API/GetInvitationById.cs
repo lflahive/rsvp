@@ -15,7 +15,18 @@ namespace Rsvp.API
         [FunctionName("GetInvitationById")]
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
         {
-            return new JsonResult(await Repository.GetInvitationByIdAsync(Guid.Parse(req.Query["eventId"]), Guid.Parse(req.Query["invitationId"])));
+            if(String.IsNullOrWhiteSpace(req.Query["eventId"]) || String.IsNullOrWhiteSpace(req.Query["invitationId"]))
+                return new BadRequestResult();
+
+            if(!Guid.TryParse(req.Query["eventId"], out var eventId) || !Guid.TryParse(req.Query["invitationId"], out var invitationId))
+                return new BadRequestResult();
+
+            var invitation = await Repository.GetInvitationByIdAsync(eventId, invitationId);
+
+            if(invitation == null)
+                return new NotFoundResult();
+
+            return new JsonResult(invitation);
         }
     }
 }

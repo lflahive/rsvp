@@ -18,7 +18,13 @@ namespace Rsvp.API
         public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req, ILogger log)
         {
             var newEvent = JsonConvert.DeserializeObject<Event>(await req.ReadAsStringAsync());
-            newEvent = await Repository.CreateEventAsync(newEvent);
+
+            var validator = new EventValidator();
+            var validatorResults = validator.Validate(newEvent);
+            if(!validatorResults.IsValid)
+                return new BadRequestObjectResult(validatorResults.Errors);
+
+            await newEvent.SaveAsync(Repository);
             return new JsonResult(newEvent);
         }
     }

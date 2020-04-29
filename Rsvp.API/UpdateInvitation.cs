@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -11,10 +9,10 @@ using Rsvp.Logic;
 
 namespace Rsvp.API
 {
-    public class CreateInvitation : BaseFunction
+    public class UpdateInvitation : BaseFunction
     {
-        [FunctionName("CreateInvitation")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req, ILogger log)
+        [FunctionName("UpdateInvitation")]
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function,  "post", Route = null)] HttpRequest req, ILogger log)
         {
             var invitation = JsonConvert.DeserializeObject<Invitation>(await req.ReadAsStringAsync());
 
@@ -23,7 +21,7 @@ namespace Rsvp.API
             if(!validatorResults.IsValid)
                 return new BadRequestObjectResult(validatorResults.Errors);
 
-            await invitation.SaveAsync(Repository);
+            await invitation.UpdateAsync(Repository);
             return new JsonResult(invitation);
         }
     }

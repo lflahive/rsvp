@@ -27,11 +27,27 @@ namespace Rsvp.Logic
             return newEvent;
         }
 
+        public async Task<Event> GetEventAsync(Guid id)
+        {
+            var operation = TableOperation.Retrieve<EventEntity>("Event", id.ToString());
+            var currentEvent = await _table.ExecuteAsync(operation);
+            return _mapper.Map<EventEntity, Event>((EventEntity)currentEvent.Result);
+        }
+
         public async Task<Invitation> CreateInvitationAsync(Invitation invitation)
         {
             var invitationEntity = _mapper.Map<Invitation, InvitationEntity>(invitation);
             var insertOperation = TableOperation.Insert(invitationEntity);
             await _table.ExecuteAsync(insertOperation);
+            return invitation;
+        }
+
+        public async Task<Invitation> UpdateInvitationAsync(Invitation invitation)
+        {
+            var invitationEntity = _mapper.Map<Invitation, InvitationEntity>(invitation);
+            invitationEntity.ETag = "*";
+            var mergeOperation = TableOperation.Merge(invitationEntity);
+            await _table.ExecuteAsync(mergeOperation);
             return invitation;
         }
 

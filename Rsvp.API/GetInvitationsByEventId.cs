@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Rsvp.API
 {
@@ -15,7 +16,18 @@ namespace Rsvp.API
         [FunctionName("GetInvitationsByEventId")]
         public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req, ILogger log)
         {
-           return new JsonResult(Repository.GetInvitationsByEventId(Guid.Parse(req.Query["eventId"])));
+            if(String.IsNullOrWhiteSpace(req.Query["eventId"]))
+                return new BadRequestResult();
+
+            if(!Guid.TryParse(req.Query["eventId"], out var eventId))
+                return new BadRequestResult();
+
+            var invitations = Repository.GetInvitationsByEventId(eventId);
+
+            if(!invitations.Any())
+                return new NotFoundResult();
+
+            return new JsonResult(invitations);
         }
     }
 }
