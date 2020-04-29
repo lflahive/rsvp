@@ -45,7 +45,6 @@ namespace Rsvp.Logic
         public async Task<Invitation> UpdateInvitationAsync(Invitation invitation)
         {
             var invitationEntity = _mapper.Map<Invitation, InvitationEntity>(invitation);
-            invitationEntity.ETag = "*";
             var mergeOperation = TableOperation.Merge(invitationEntity);
             await _table.ExecuteAsync(mergeOperation);
             return invitation;

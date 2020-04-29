@@ -16,11 +16,13 @@ namespace Rsvp.Logic
                     .ConvertUsing(x => JsonConvert.DeserializeObject<List<Guest>>(x));
                 config.CreateMap<Event, EventEntity>()
                     .BeforeMap((s, d) => d.PartitionKey = "Event")
+                    .BeforeMap((s, d) => d.ETag = "*")
                     .ForMember(d => d.RowKey, o => o.MapFrom(s => s.Id));
                 config.CreateMap<EventEntity, Event>()
                     .ForMember(d => d.Id, o => o.MapFrom(s => s.RowKey));
                 config.CreateMap<Invitation, InvitationEntity>()
                     .BeforeMap((s, d) => d.PartitionKey = $"Invitation_{s.EventId}")
+                    .BeforeMap((s, d) => d.ETag = "*")
                     .ForMember(d => d.RowKey, o => o.MapFrom(s => s.Id));
                 config.CreateMap<InvitationEntity, Invitation>()
                     .ForMember(d => d.Id, o => o.MapFrom(s => s.RowKey));
